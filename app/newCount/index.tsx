@@ -1,11 +1,13 @@
 import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { getAvailableColors, ColorOption } from '../../data/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { CountData } from '../../types/count';
+import { ColorDrawer } from '../colors';
+import type { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 
 function ColorSwatch({
   bg,
@@ -47,6 +49,8 @@ const Index = () => {
   const [startValue, setStartValue] = useState('');
   const [availableColors, setAvailableColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const colorDrawerRef = useRef<BottomSheetMethods>(null);
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     const loadColors = async () => {
@@ -134,11 +138,24 @@ const Index = () => {
           value={startValue}
           onChangeText={setStartValue}
         />
-        <Text className="mt-6 p-2 px-4 text-base font-medium uppercase">Choose a color</Text>
+        <View className="mt-6 flex-row items-center justify-between gap-2  px-4">
+          <Text className="text-base font-medium uppercase">Choose a color</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setDrawerOpen(true);
+              setTimeout(() => colorDrawerRef.current?.expand(), 10);
+            }}
+            className="flex flex-row items-center gap-2">
+            <Ionicons name="add" size={16} color="blue" />
+            <Text className="text-base font-medium uppercase text-black text-blue-800">
+              Add Color
+            </Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="flex flex-row gap-4 pe-10 ps-4">
+          className="mt-2 mt-4 flex flex-row gap-4 pe-10 ps-4">
           {availableColors.map(({ bg, fg }, idx) => (
             <ColorSwatch
               key={idx}
@@ -160,6 +177,7 @@ const Index = () => {
           <Text className="text-2xl font-semibold text-white">Save</Text>
         </TouchableOpacity>
       </View>
+      {isDrawerOpen && <ColorDrawer ref={colorDrawerRef} onClose={() => setDrawerOpen(false)} />}
     </View>
   );
 };

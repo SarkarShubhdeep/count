@@ -51,13 +51,8 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
-      <View className="flex-row items-center justify-between p-4">
+      <View className="flex-row items-center justify-center p-4">
         <Text className="text-4xl font-bold uppercase">count</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/colors')}
-          className="rounded-full bg-gray-200 p-2">
-          <Ionicons name="color-palette" size={24} color="black" />
-        </TouchableOpacity>
       </View>
       <View className="flex-1 pb-[100px] ">
         <FlatList
