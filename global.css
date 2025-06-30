@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+Text {
+  font-family: 'SpaceGrotesk-Regular', sans-serif;
+}
