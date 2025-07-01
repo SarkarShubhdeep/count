@@ -66,11 +66,6 @@ const Index = () => {
     loadColors();
   }, []);
 
-  const handleSelect = (idx: number) => {
-    setSelectedIdx(idx);
-    console.log('Selected color:', availableColors[idx]);
-  };
-
   const handleSave = async () => {
     const countsString = await AsyncStorage.getItem('counts');
     const counts: CountData[] = countsString ? JSON.parse(countsString) : [];
@@ -81,8 +76,8 @@ const Index = () => {
       description,
       count: startValue ? Number(startValue) : 0,
       targetCount: Number(targetCount),
-      color: availableColors[selectedIdx ?? 0].bg,
-      fg: availableColors[selectedIdx ?? 0].fg,
+      color: availableColors[selectedIdx ?? 0]?.bg || '#000',
+      fg: availableColors[selectedIdx ?? 0]?.fg || '#fff',
     };
     const updatedCounts = [...counts, newCount];
     await AsyncStorage.setItem('counts', JSON.stringify(updatedCounts));
@@ -90,6 +85,9 @@ const Index = () => {
   };
 
   const isSaveDisabled = !title.trim() || !targetCount.trim() || loading;
+
+  const defaultColors = availableColors.slice(0, 7); // adjust this based on your default colors count
+  const customColors = availableColors.slice(7); // adjust this based on your default colors count
 
   if (loading) {
     return (
@@ -152,20 +150,44 @@ const Index = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        <Text className="mt-4 px-4 text-xs font-semibold uppercase text-gray-500">
+          Default Colors
+        </Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="mt-2 mt-4 flex flex-row gap-4 pe-10 ps-4">
-          {availableColors.map(({ bg, fg }, idx) => (
+          className="mt-2 flex flex-row gap-4 pe-10 ps-4">
+          {defaultColors.map(({ bg, fg }, idx) => (
             <ColorSwatch
               key={idx}
               bg={bg}
               fg={fg}
               selected={selectedIdx === idx}
-              onPress={() => handleSelect(idx)}
+              onPress={() => setSelectedIdx(idx)}
             />
           ))}
         </ScrollView>
+        {customColors.length > 0 && (
+          <>
+            <Text className="mt-4 px-4 text-xs font-semibold uppercase text-gray-500">
+              Custom Colors
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="mt-2 flex flex-row gap-4 pe-10 ps-4">
+              {customColors.map(({ bg, fg }, idx) => (
+                <ColorSwatch
+                  key={idx + defaultColors.length}
+                  bg={bg}
+                  fg={fg}
+                  selected={selectedIdx === idx + defaultColors.length}
+                  onPress={() => setSelectedIdx(idx + defaultColors.length)}
+                />
+              ))}
+            </ScrollView>
+          </>
+        )}
       </View>
 
       <View className="h-[100px] w-full items-center justify-center bg-neutral-900 p-5">
