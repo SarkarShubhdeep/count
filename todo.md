@@ -14,3 +14,8 @@ struggling with reanimated color picker
 app crashed if it's clicked
 
 reanimated anything is not working actually and it's supposed to be better
+
+### In this branch...
+
+Removed the reanimated color picker and ability to choose custom color.
+Focusing on MVP product.

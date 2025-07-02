@@ -5,6 +5,8 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BlurView } from 'expo-blur';
+import { View, Text } from 'react-native';
 
 import '../global.css';
 
@@ -34,11 +36,42 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
+            headerBlurEffect: 'light',
+            headerStyle: {
+              backgroundColor: 'transparent',
+            },
+            headerShadowVisible: false,
           }}>
           <Stack.Screen
             name="index"
             options={{
-              title: 'Home',
+              headerShown: true,
+              header: () => (
+                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+                  <BlurView
+                    intensity={40}
+                    tint="light"
+                    style={{
+                      width: '100%',
+                      paddingTop: 70,
+                      paddingBottom: 12,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      className="text-4xl font-bold uppercase"
+                      style={{ color: 'rgba(0,0,0,0.85)' }}>
+                      count
+                    </Text>
+                  </BlurView>
+                </View>
+              ),
+              headerTransparent: true,
+              headerTitle: '',
+              headerStyle: {
+                backgroundColor: 'transparent',
+              },
+              headerShadowVisible: false,
             }}
           />
         </Stack>

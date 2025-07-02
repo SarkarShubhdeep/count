@@ -1,13 +1,11 @@
 import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { getAvailableColors, ColorOption } from '../../data/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { CountData } from '../../types/count';
-import { ColorDrawer } from '../colors';
-import type { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 
 function ColorSwatch({
   bg,
@@ -49,14 +47,12 @@ const Index = () => {
   const [startValue, setStartValue] = useState('');
   const [availableColors, setAvailableColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
-  const colorDrawerRef = useRef<BottomSheetMethods>(null);
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     const loadColors = async () => {
       try {
         const colors = await getAvailableColors();
-        setAvailableColors(colors);
+        setAvailableColors(colors.slice(0, 7)); // Only use default colors
       } catch (error) {
         console.error('Error loading colors:', error);
       } finally {
@@ -86,8 +82,7 @@ const Index = () => {
 
   const isSaveDisabled = !title.trim() || !targetCount.trim() || loading;
 
-  const defaultColors = availableColors.slice(0, 7); // adjust this based on your default colors count
-  const customColors = availableColors.slice(7); // adjust this based on your default colors count
+  const defaultColors = availableColors; // Only default colors
 
   if (loading) {
     return (
@@ -98,17 +93,17 @@ const Index = () => {
   }
 
   return (
-    <View className="flex h-full flex-col items-center justify-between gap-4">
+    <View className="flex h-full flex-col items-center justify-between gap-4 pt-10">
       <View className="justify-left flex w-full flex-col  pt-10">
-        <Text className="p-2 px-4 text-base font-medium uppercase">title</Text>
+        <Text className="p-2 px-4 font-medium text-base uppercase">title</Text>
         <TextInput
-          className="w-full rounded-md border-b border-gray-300 p-2 px-4 text-4xl font-semibold"
+          className="w-full rounded-md border-b border-gray-300 p-2 px-4 font-semibold text-4xl"
           placeholder="Keep it short "
           placeholderTextColor="gray"
           value={title}
           onChangeText={setTitle}
         />
-        <Text className="mt-6 p-2 px-4 text-base font-medium uppercase">Description</Text>
+        <Text className="mt-6 p-2 px-4 font-medium text-base uppercase">Description</Text>
         <TextInput
           className="w-full rounded-md border-b border-gray-300 p-2 px-4 text-lg"
           placeholder="Because it looks good"
@@ -116,41 +111,28 @@ const Index = () => {
           value={description}
           onChangeText={setDescription}
         />
-        <Text className="mt-6 p-2 px-4 text-base font-medium uppercase">Target Count</Text>
+        <Text className="mt-6 p-2 px-4 font-medium text-base uppercase">Target Count</Text>
         <TextInput
-          className="w-full rounded-md border-b border-gray-300 p-2 px-4 text-4xl font-semibold"
+          className="w-full rounded-md border-b border-gray-300 p-2 px-4 font-semibold text-4xl"
           placeholder="00"
           placeholderTextColor="gray"
           keyboardType="numeric"
           value={targetCount}
           onChangeText={setTargetCount}
         />
-        <Text className="mt-6 p-2 px-4 text-base font-medium uppercase">
+        <Text className="mt-6 p-2 px-4 font-medium text-base uppercase">
           Start Value (Optional)
         </Text>
         <TextInput
-          className="w-full rounded-md border-b border-gray-300 p-2 px-4 text-4xl font-semibold"
+          className="w-full rounded-md border-b border-gray-300 p-2 px-4 font-semibold text-4xl"
           placeholder="00"
           placeholderTextColor="gray"
           keyboardType="numeric"
           value={startValue}
           onChangeText={setStartValue}
         />
-        <View className="mt-6 flex-row items-center justify-between gap-2  px-4">
-          <Text className="text-base font-medium uppercase">Choose a color</Text>
-          <TouchableOpacity
-            onPress={() => {
-              setDrawerOpen(true);
-              setTimeout(() => colorDrawerRef.current?.expand(), 10);
-            }}
-            className="flex flex-row items-center gap-2">
-            <Ionicons name="add" size={16} color="blue" />
-            <Text className="text-base font-medium uppercase text-black text-blue-800">
-              Add Color
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <Text className="mt-4 px-4 text-xs font-semibold uppercase text-gray-500">
+        <Text className="mt-6 p-2 px-4 font-medium text-base uppercase">Choose a color</Text>
+        <Text className="mt-4 px-4 font-semibold text-xs uppercase text-gray-500">
           Default Colors
         </Text>
         <ScrollView
@@ -167,27 +149,6 @@ const Index = () => {
             />
           ))}
         </ScrollView>
-        {customColors.length > 0 && (
-          <>
-            <Text className="mt-4 px-4 text-xs font-semibold uppercase text-gray-500">
-              Custom Colors
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="mt-2 flex flex-row gap-4 pe-10 ps-4">
-              {customColors.map(({ bg, fg }, idx) => (
-                <ColorSwatch
-                  key={idx + defaultColors.length}
-                  bg={bg}
-                  fg={fg}
-                  selected={selectedIdx === idx + defaultColors.length}
-                  onPress={() => setSelectedIdx(idx + defaultColors.length)}
-                />
-              ))}
-            </ScrollView>
-          </>
-        )}
       </View>
 
       <View className="h-[100px] w-full items-center justify-center bg-neutral-900 p-5">
@@ -196,10 +157,9 @@ const Index = () => {
           onPress={isSaveDisabled ? undefined : handleSave}
           activeOpacity={isSaveDisabled ? 1 : 0.7}
           style={{ opacity: isSaveDisabled ? 0.5 : 1 }}>
-          <Text className="text-2xl font-semibold text-white">Save</Text>
+          <Text className="font-semibold text-2xl text-white">Save</Text>
         </TouchableOpacity>
       </View>
-      {isDrawerOpen && <ColorDrawer ref={colorDrawerRef} onClose={() => setDrawerOpen(false)} />}
     </View>
   );
 };
