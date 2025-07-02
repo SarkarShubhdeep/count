@@ -51,16 +51,12 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
-      <View className="flex-row items-center justify-between p-4">
+      {/* <View className="flex-row items-center justify-center p-4">
         <Text className="text-4xl font-bold uppercase">count</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/colors')}
-          className="rounded-full bg-gray-200 p-2">
-          <Ionicons name="color-palette" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-      <View className="flex-1 pb-[100px] ">
+      </View> */}
+      <View className="flex-1 pb-[100px]">
         <FlatList
+          className="pt-20"
           data={paddedData}
           keyExtractor={(item, idx) =>
             isPlaceholderItem(item) ? `placeholder-${idx}` : item.id.toString()
@@ -72,6 +68,7 @@ export default function HomeScreen() {
                 style={{
                   flex: 1,
                   height: 180,
+
                   backgroundColor: 'transparent',
                 }}
               />
@@ -81,7 +78,8 @@ export default function HomeScreen() {
                 countTitle={item.countTitle}
                 count={item.count}
                 targetCount={item.targetCount}
-                color={item.color}
+                backgroundColor={item.color}
+                foregroundColor={item.fg}
               />
             )
           }
